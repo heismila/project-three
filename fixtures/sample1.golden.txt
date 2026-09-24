@@ -1,0 +1,21 @@
+============ REPORT ============
+file: C:\Users\USER\project-three\fixtures\sample1.txt
+generated: Wed Sep 23 16:12:31 2026
+total chars: 128
+total lines: 3
+total words: 8
+unique words: 8
+avg word length: 5.38
+min word length: 5
+-------- TOP 10 --------
+  quick: 1
+  brown: 1
+  jumps: 1
+  barks: 1
+  foxes: 1
+  clever: 1
+  animals: 1
+  knows: 1
+longest word: animals
+shortest word: quick
+================================

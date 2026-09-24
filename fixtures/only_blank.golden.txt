@@ -1,0 +1,12 @@
+============ REPORT ============
+file: C:\Users\USER\project-three\fixtures\only_blank.txt
+generated: Wed Sep 23 16:12:30 2026
+total chars: 4
+total lines: 4
+total words: 0
+unique words: 0
+avg word length: 0
+min word length: 3
+-------- TOP 10 --------
+longest word: 
+================================
