@@ -1,4 +1,4 @@
-﻿import sys, os, re, time, csv
+﻿import sys, os, time, csv
 
 # global state everywhere
 d = {}
