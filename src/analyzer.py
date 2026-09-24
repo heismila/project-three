@@ -194,9 +194,7 @@ def main():
         text = format_text()
     print(text)
     save_output(text)
-    elapsed = time.time() - start_time
-    # not printed, but kept for future use
-    _ = elapsed
+    
 
 if __name__ == "__main__":
     main()
