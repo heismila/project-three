@@ -5,7 +5,6 @@ d = {}
 lines = []
 wc = 0
 chars = 0
-start_time = 0
 report_format = "text"
 output_file = None
 summary_only = False
@@ -157,8 +156,7 @@ def save_output(text):
             fh.write(text)
 
 def main():
-    global report_format, output_file, start_time, summary_only, min_len, input_file, start_time_human
-    start_time = time.time()
+    global report_format, output_file, summary_only, min_len, input_file, start_time_human
     start_time_human = time.ctime()
     if len(sys.argv) < 2:
         print("usage: analyzer.py <file> [--format text|html|csv] [--output FILE] [--summary] [--min-length N]")
