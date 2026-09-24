@@ -19,13 +19,13 @@ min_len = DEFAULT_MIN_LEN
 input_file = ""
 start_time_human = ""
 
-def read_it(f):
-    global lines, chars
-    with open(f, 'r', encoding=ENCODING) as fh:
-        content = fh.read()
-    chars = len(content)
-    lines = content.split('\n')
-    return content
+def read_file(path):
+    with open(path, 'r', encoding=ENCODING) as fh:
+        return fh.read()
+
+
+def parse_lines(content):
+    return content.split('\n')
 
 def clean(w):
     w = w.lower()
@@ -152,7 +152,7 @@ def save_output(text):
             fh.write(text)
 
 def main():
-    global report_format, output_file, summary_only, min_len, input_file, start_time_human
+    global report_format, output_file, summary_only, min_len, input_file, start_time_human, lines, chars
     start_time_human = time.ctime()
     if len(sys.argv) < 2:
         print("usage: analyzer.py <file> [--format text|html|csv] [--output FILE] [--summary] [--min-length N]")
@@ -178,7 +178,9 @@ def main():
             i = i + 2
         else:
             i = i + 1
-    c = read_it(f)
+        c = read_file(f)
+    lines = parse_lines(c)
+    chars = len(c)
     analyze(c)
     if report_format == "html":
         text = format_html()
