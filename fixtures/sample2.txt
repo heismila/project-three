@@ -1,0 +1,2 @@
+﻿Python is great. Python is powerful. Python is readable.
+Coding in Python is fun, and Python programmers love Python.
