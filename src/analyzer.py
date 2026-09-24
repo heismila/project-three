@@ -1,20 +1,27 @@
 ﻿import sys, os, time, csv
-
+# ---- Constants (previously magic numbers and strings) ----
+DEFAULT_MIN_LEN = 3
+TOP_N = 10
+ENCODING = "utf-8"
+FORMAT_TEXT = "text"
+FORMAT_HTML = "html"
+FORMAT_CSV = "csv"
+INITIAL_AVERAGE = 0
 # global state everywhere
 d = {}
 lines = []
 wc = 0
 chars = 0
-report_format = "text"
+report_format = FORMAT_TEXT
 output_file = None
 summary_only = False
-min_len = 3
+min_len = DEFAULT_MIN_LEN
 input_file = ""
 start_time_human = ""
 
 def read_it(f):
     global lines, chars
-    with open(f, 'r', encoding='utf-8') as fh:
+    with open(f, 'r', encoding=ENCODING) as fh:
         content = fh.read()
     chars = len(content)
     lines = content.split('\n')
@@ -92,7 +99,7 @@ def format_text():
     if not summary_only:
         out.append("-------- TOP 10 --------")
         items = get_sorted_items()
-        for i in range(min(10, len(items))):
+        for i in range(min(TOP_N, len(items))):
             out.append("  " + items[i][0] + ": " + str(items[i][1]))
         out.append("longest word: " + get_longest())
         s = get_shortest()
@@ -117,7 +124,7 @@ def format_html():
     if not summary_only:
         out.append("<h2>Top 10</h2><ul>")
         items = get_sorted_items()
-        for i in range(min(10, len(items))):
+        for i in range(min(TOP_N, len(items))):
             out.append("<li>" + items[i][0] + ": " + str(items[i][1]) + "</li>")
         out.append("</ul>")
         out.append("<p>longest word: " + get_longest() + "</p>")
@@ -141,7 +148,7 @@ def format_csv():
     out.append("min_word_length," + str(min_len))
     if not summary_only:
         items = get_sorted_items()
-        for i in range(min(10, len(items))):
+        for i in range(min(TOP_N, len(items))):
             out.append("word_" + str(i+1) + "," + items[i][0] + ":" + str(items[i][1]))
         out.append("longest," + get_longest())
         s = get_shortest()
@@ -152,7 +159,7 @@ def format_csv():
 def save_output(text):
     global output_file
     if output_file is not None:
-        with open(output_file, 'w', encoding='utf-8') as fh:
+        with open(output_file, 'w', encoding=ENCODING) as fh:
             fh.write(text)
 
 def main():
