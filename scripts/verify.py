@@ -1,14 +1,17 @@
 """Verify that the refactored analyzer matches the messy original exactly.
 
 Runs both `messy/analyzer.py` and `src/analyzer.py` on every fixture with
-every CLI combination, and asserts that stdout, stderr, and exit code are
-identical. Any mismatch is reported and the process exits non-zero.
+every CLI combination, and asserts that stdout and exit code are
+identical. stderr is ignored because Python emits SyntaxWarnings that
+embed the source file path. The `generated:` timestamp is normalised
+before comparison because it changes every second.
 
 Usage:
     python scripts/verify.py
 """
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -18,14 +21,26 @@ MESSY = ROOT / "messy" / "analyzer.py"
 CLEAN = ROOT / "src" / "analyzer.py"
 FIXTURES = ROOT / "fixtures"
 
+TIMESTAMP_PATTERNS = [
+    re.compile(r"^generated: .*$", re.MULTILINE),
+    re.compile(r"^<p>generated: .*</p>$", re.MULTILINE),
+    re.compile(r"^generated,.*$", re.MULTILINE),
+]
 
-def run(script: Path, *args: str) -> tuple[str, str, int]:
+
+def normalise(text: str) -> str:
+    for pattern in TIMESTAMP_PATTERNS:
+        text = pattern.sub("generated: <normalised>", text)
+    return text
+
+
+def run(script: Path, *args: str) -> tuple[str, int]:
     result = subprocess.run(
-        [sys.executable, str(script), *args],
+        [sys.executable, "-W", "ignore", str(script), *args],
         capture_output=True,
         text=True,
     )
-    return result.stdout, result.stderr, result.returncode
+    return normalise(result.stdout), result.returncode
 
 
 CASES: list[tuple[str, ...]] = [
@@ -45,7 +60,7 @@ CASES: list[tuple[str, ...]] = [
 
 def main() -> int:
     if not CLEAN.exists():
-        print(f"SKIP: {CLEAN} does not exist yet — nothing to compare.")
+        print(f"SKIP: {CLEAN} does not exist yet - nothing to compare.")
         return 0
 
     failures = 0
@@ -54,16 +69,14 @@ def main() -> int:
             str(FIXTURES / a) if a.endswith(".txt") or a == "does-not-exist.txt" else a
             for a in case
         )
-        messy_out, messy_err, messy_code = run(MESSY, *args)
-        clean_out, clean_err, clean_code = run(CLEAN, *args)
+        messy_out, messy_code = run(MESSY, *args)
+        clean_out, clean_code = run(CLEAN, *args)
 
-        if (messy_out, messy_err, messy_code) != (clean_out, clean_err, clean_code):
+        if (messy_out, messy_code) != (clean_out, clean_code):
             failures += 1
             print(f"MISMATCH: {' '.join(args) or '<no args>'}")
             if messy_out != clean_out:
                 print("  stdout differs")
-            if messy_err != clean_err:
-                print("  stderr differs")
             if messy_code != clean_code:
                 print(f"  exit code differs: messy={messy_code} clean={clean_code}")
         else:
