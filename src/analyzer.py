@@ -31,36 +31,25 @@ def clean(w):
     w = w.lower()
     w = w.strip('.,!?;:"\'()[]{}')
     return w
+def should_count(w):
+    if w == "":
+        return False
+    if len(w) < min_len:
+        return False
+    return True
 
 def analyze(content):
-    global d, wc, min_len
+    global d, wc
     ws = content.split()
-    for i in range(len(ws)):
-        w = ws[i]
-        if w == "":
-            continue
-        w = clean(w)
-        if w == "":
-            continue
-        if len(w) < min_len:
+    for raw in ws:
+        w = clean(raw)
+        if not should_count(w):
             continue
         wc = wc + 1
-        if w in d:
-            d[w] = d[w] + 1
-        else:
-            d[w] = 1
+        d[w] = d.get(w, 0) + 1
 
 def get_sorted_items():
-    items = []
-    for k in d:
-        items.append((k, d[k]))
-    for i in range(len(items)):
-        for j in range(len(items) - 1):
-            if items[j][1] < items[j+1][1]:
-                tmp = items[j]
-                items[j] = items[j+1]
-                items[j+1] = tmp
-    return items
+    return sorted(d.items(), key=lambda kv: -kv[1])
 
 def get_avg_len():
     total_len = 0
@@ -99,8 +88,8 @@ def format_text():
     if not summary_only:
         out.append("-------- TOP 10 --------")
         items = get_sorted_items()
-        for i in range(min(TOP_N, len(items))):
-            out.append("  " + items[i][0] + ": " + str(items[i][1]))
+        for word, count in items[:TOP_N]:
+            out.append("  " + word + ": " + str(count))
         out.append("longest word: " + get_longest())
         s = get_shortest()
         if s is not None:
@@ -124,8 +113,8 @@ def format_html():
     if not summary_only:
         out.append("<h2>Top 10</h2><ul>")
         items = get_sorted_items()
-        for i in range(min(TOP_N, len(items))):
-            out.append("<li>" + items[i][0] + ": " + str(items[i][1]) + "</li>")
+        for word, count in items[:TOP_N]:
+            out.append("<li>" + word + ": " + str(count) + "</li>")
         out.append("</ul>")
         out.append("<p>longest word: " + get_longest() + "</p>")
         s = get_shortest()
@@ -148,8 +137,8 @@ def format_csv():
     out.append("min_word_length," + str(min_len))
     if not summary_only:
         items = get_sorted_items()
-        for i in range(min(TOP_N, len(items))):
-            out.append("word_" + str(i+1) + "," + items[i][0] + ":" + str(items[i][1]))
+        for i, (word, count) in enumerate(items[:TOP_N]):
+            out.append("word_" + str(i+1) + "," + word + ":" + str(count))
         out.append("longest," + get_longest())
         s = get_shortest()
         if s is not None:
