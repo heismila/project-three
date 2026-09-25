@@ -178,7 +178,7 @@ def main():
             i = i + 2
         else:
             i = i + 1
-        c = read_file(f)
+    c = read_file(f)
     lines = parse_lines(c)
     chars = len(c)
     analyze(c)
